@@ -32,6 +32,8 @@ public class Main : Plugin<Config>
         if (Config.TeslaConditions) TeslaConditions.RegisterEvents();
         if (Config.Scp914Kill) Kill914.RegisterEvents();
         
+        Assets.Load();
+        
         Logger.Info("RPF enabled");
     }
 

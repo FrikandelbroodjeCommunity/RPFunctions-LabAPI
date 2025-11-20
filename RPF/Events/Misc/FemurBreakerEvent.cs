@@ -1,13 +1,15 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+using FrikanUtils.ProjectMer;
 using Interactables.Interobjects.DoorUtils;
-using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Handlers;
 using LabApi.Features.Enums;
 using LabApi.Features.Wrappers;
+using MapGeneration;
+using MEC;
 using PlayerRoles;
+using ProjectMER.Features.Extensions;
 using UnityEngine;
 using Logger = LabApi.Features.Console.Logger;
 
@@ -15,32 +17,52 @@ namespace RPF.Events.Misc;
 
 public static class FemurBreakerEvent
 {
-    private static readonly Config _config;
+    private static Config Config => Main.Instance.Config;
 
     private static bool _isRunning;
     private static bool _doorUnlockedByGenerators;
     private static Door _entranceDoor;
     private static Door _chamberDoor;
-    private static CancellationTokenSource _monitorCts;
+    private static CoroutineHandle _handle;
+
+    private static FemurBreakerKillTrigger _trigger;
 
     public static void RegisterEvents()
     {
-        PlayerEvents.InteractingDoor += OnDoorInteract;
         ServerEvents.RoundStarted += OnRoundStarted;
     }
 
     public static void UnregisterEvents()
     {
-        PlayerEvents.InteractingDoor -= OnDoorInteract;
         ServerEvents.RoundStarted -= OnRoundStarted;
 
-        _monitorCts?.Cancel();
-        _monitorCts?.Dispose();
-        _monitorCts = null;
+        if (_handle.IsRunning)
+        {
+            Timing.KillCoroutines(_handle);
+        }
     }
 
     private static void OnRoundStarted()
     {
+        if (!Assets.Loaded) return;
+
+        var room = Room.Get(RoomName.Hcz106).First();
+        var spawned = Assets.FemurBreaker.SpawnSchematic(room.Position, room.GetAbsoluteRotation(Vector3.zero));
+
+        _trigger = spawned.FindNamedObjects("Trigger").First().gameObject.AddComponent<FemurBreakerKillTrigger>();
+        _trigger.Door = spawned.FindNamedObjects("Door").First();
+        _trigger.OriginalPos = _trigger.Door.position;
+        _trigger.Door.position = Vector3.zero;
+
+        spawned.FindNamedObjects("Button").First().RegisterPickupAction((ply, _) =>
+        {
+            if (_isRunning || !_trigger.HasSacrifice) return;
+            if (ply.IsHuman || !Config.OnlyHumansCanTrigger)
+            {
+                Timing.RunCoroutine(RunFemurBreaker());
+            }
+        }, "FemurBreaker", 10);
+
         _isRunning = false;
         _doorUnlockedByGenerators = false;
 
@@ -56,67 +78,35 @@ public static class FemurBreakerEvent
         if (_chamberDoor != null)
         {
             _chamberDoor.IsOpened = false;
-            _entranceDoor.Lock(DoorLockReason.AdminCommand, true);
+            _chamberDoor.Lock(DoorLockReason.AdminCommand, true);
         }
 
-        _monitorCts?.Cancel();
-        _monitorCts?.Dispose();
-        _monitorCts = new CancellationTokenSource();
-        _ = MonitorGeneratorsAsync(_monitorCts.Token);
+        if (_handle.IsRunning)
+        {
+            Timing.KillCoroutines(_handle);
+        }
+
+        _handle = Timing.RunCoroutine(MonitorGeneratorsAsync());
     }
 
-    private static void OnDoorInteract(PlayerInteractingDoorEventArgs ev)
+    private static IEnumerator<float> MonitorGeneratorsAsync()
     {
-        if (ev.Door != _entranceDoor && ev.Door != _chamberDoor)
+        yield return Timing.WaitForSeconds(60);
+        while (Round.IsRoundStarted)
         {
-            return;
-        }
-
-        if (!_doorUnlockedByGenerators && CountActiveGenerators() < _config.GeneratorsRequired)
-        {
-            ev.Player.SendHint("<color=red>The cell is Blocked! Activate all Generators!</color>", 10);
-            ev.IsAllowed = false;
-            return;
-        }
-
-        if (_config.OnlyHumansCanTrigger && (ev.Player.Team == Team.SCPs || ev.Player.Team == Team.Dead))
-        {
-            return;
-        }
-
-        if (!_isRunning)
-        {
-            _ = RunFemurBreaker();
-        }
-    }
-
-    private static async Task MonitorGeneratorsAsync(CancellationToken ct)
-    {
-        try
-        {
-            while (!ct.IsCancellationRequested && Round.IsRoundStarted)
+            var active = CountActiveGenerators();
+            if (!_doorUnlockedByGenerators && active >= Config.GeneratorsRequired)
             {
-                var active = CountActiveGenerators();
-                if (!_doorUnlockedByGenerators && active >= _config.GeneratorsRequired)
-                {
-                    _doorUnlockedByGenerators = true;
+                _doorUnlockedByGenerators = true;
 
-                    _entranceDoor?.Lock(DoorLockReason.AdminCommand, false);
-                    _chamberDoor?.Lock(DoorLockReason.AdminCommand, false);
+                _entranceDoor?.Lock(DoorLockReason.AdminCommand, false);
+                _chamberDoor?.Lock(DoorLockReason.AdminCommand, false);
 
-                    Logger.Info("[FemurBreaker] Generators threshold reached: SCP-106 doors unlocked.");
-                    break;
-                }
-
-                await Task.Delay(1000, ct);
+                Logger.Info("[FemurBreaker] Generators threshold reached: SCP-106 doors unlocked.");
+                yield break;
             }
-        }
-        catch (TaskCanceledException)
-        {
-        }
-        catch (Exception ex)
-        {
-            Logger.Error($"[FemurBreaker] MonitorGeneratorsAsync error: {ex}");
+
+            yield return Timing.WaitForSeconds(5);
         }
     }
 
@@ -125,9 +115,9 @@ public static class FemurBreakerEvent
         return Generator.List.Count(g => g.Engaged);
     }
 
-    public static async Task RunFemurBreaker()
+    public static IEnumerator<float> RunFemurBreaker()
     {
-        Logger.Info("[FemurBreaker] Activated: playing ambient sound.");
+        _isRunning = true;
 
         Map.SetColorOfLights(Color.red);
         Cassie.Message(
@@ -135,7 +125,7 @@ public static class FemurBreakerEvent
             isNoisy: false,
             customSubtitles: "Activating femur breaker");
 
-        await Task.Delay(_config.FemurBreakerDelay);
+        yield return Timing.WaitForSeconds(Config.FemurBreakerDelaySeconds);
 
         var scp106 = Player.List.FirstOrDefault(p => p.IsAlive && p.Role == RoleTypeId.Scp106);
         if (scp106 != null)
@@ -149,7 +139,7 @@ public static class FemurBreakerEvent
             isNoisy: false,
             customSubtitles: "SCP-106 successfully terminated");
         Map.SetColorOfLights(Color.green);
-        await Task.Delay(1000);
+        yield return Timing.WaitForSeconds(1);
         Map.ResetColorOfLights();
     }
 }

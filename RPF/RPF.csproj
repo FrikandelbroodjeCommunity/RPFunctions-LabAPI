@@ -34,6 +34,7 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Include="Assets.cs" />
         <Compile Include="Commands\Client\FemurActivator.cs" />
         <Compile Include="Commands\Client\Hack.cs" />
         <Compile Include="Commands\Client\Overload.cs" />
@@ -56,6 +57,7 @@
         <Compile Include="Events\CustomWeapon\weapons\AimBotGun.cs" />
         <Compile Include="Events\CustomWeapon\weapons\MediGun.cs" />
         <Compile Include="Events\Misc\FemurBreakerEvent.cs" />
+        <Compile Include="Events\Misc\FemurBreakerKillTrigger.cs" />
         <Compile Include="Events\RPSCP\Scp096ElevatorRestriction.cs" />
         <Compile Include="Events\RPSCP\Scp106DoorRestriction.cs" />
         <Compile Include="Events\RPSCP\Scp939DoorRestriction.cs" />
@@ -109,6 +111,9 @@
       <Reference Include="Pooling">
         <HintPath>$(SL_REFERENCES)\Pooling.dll</HintPath>
       </Reference>
+        <Reference Include="ProjectMER">
+            <HintPath>$(SL_DEPENDENCIES)\ProjectMER-publicized.dll</HintPath>
+        </Reference>
       <Reference Include="System"/>
       <Reference Include="System.Core"/>
       <Reference Include="System.Data"/>
@@ -122,6 +127,9 @@
       <Reference Include="UnityEngine.CoreModule">
         <HintPath>$(UNITY_REFERENCES)\UnityEngine.CoreModule.dll</HintPath>
       </Reference>
+        <Reference Include="UnityEngine.PhysicsModule">
+            <HintPath>$(UNITY_REFERENCES)\UnityEngine.PhysicsModule.dll</HintPath>
+        </Reference>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

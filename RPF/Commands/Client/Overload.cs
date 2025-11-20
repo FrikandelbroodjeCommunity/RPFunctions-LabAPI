@@ -11,8 +11,8 @@ namespace RPF.Commands.Client;
 [CommandHandler(typeof(ClientCommandHandler))]
 public class Overload : ICommand
 {
-    public string Command => Main.Instance.Config.OverloadCommand;
-    public string[] Aliases => new[] { "Overload" };
+    public string Command => "overload";
+    public string[] Aliases => Array.Empty<string>();
     public string Description => "Command for 079";
     
     private static bool _usedThisRound;

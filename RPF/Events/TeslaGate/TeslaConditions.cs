@@ -1,29 +1,27 @@
-﻿using Exiled.API.Features;
-using Exiled.Events.EventArgs.Player;
+﻿using LabApi.Events.Arguments.PlayerEvents;
+using LabApi.Events.Handlers;
 using PlayerRoles;
 
 namespace RPF.Events.TeslaGate;
 
 public class TeslaConditions
 {
-    public void OnTeslaActivated(TriggeringTeslaEventArgs ev)
+    public static void RegisterEvents()
     {
-        if (!Main.Instance.Config.TeslaConditions)
-            return;
-        if (ev.Player.Role.Team == Team.FoundationForces)
-        {
-            ev.IsAllowed = false;
-            ev.Player.ShowHint("Tesla disabled for member of the foundation.");
-        }
-    }
-    
-    public void Register()
-    {
-        Exiled.Events.Handlers.Player.TriggeringTesla += OnTeslaActivated;
+        PlayerEvents.TriggeringTesla += OnTeslaActivated;
     }
 
-    public void Unregister()
+    public static void UnregisterEvents()
     {
-        Exiled.Events.Handlers.Player.TriggeringTesla -= OnTeslaActivated;
+        PlayerEvents.TriggeringTesla -= OnTeslaActivated;
+    }
+
+    private static void OnTeslaActivated(PlayerTriggeringTeslaEventArgs ev)
+    {
+        if (ev.Player.Team == Team.FoundationForces)
+        {
+            ev.IsAllowed = false;
+            ev.Player.SendHint("Tesla disabled for member of the foundation.", 10);
+        }
     }
 }

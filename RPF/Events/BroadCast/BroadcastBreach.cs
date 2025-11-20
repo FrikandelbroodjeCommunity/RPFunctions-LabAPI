@@ -1,44 +1,55 @@
 ﻿using System;
-using Exiled.API.Enums;
-using Exiled.API.Features;
-using Exiled.API.Features.Doors;
-using PluginAPI.Core;
-using Cassie = Exiled.API.Features.Cassie;
-using Log = Exiled.API.Features.Log;
-using Map = Exiled.API.Features.Map;
+using Interactables.Interobjects.DoorUtils;
+using LabApi.Events.Handlers;
+using LabApi.Features.Console;
+using LabApi.Features.Wrappers;
+using MEC;
 
-namespace RPF.Events.BroadCast
+namespace RPF.Events.BroadCast;
+
+public static class BroadCastBreach
 {
-    public class BroadCastBreach
+    public static void RegisterEvents()
     {
-        private void FlickerAllLights()
+        ServerEvents.RoundStarted += OnRoundStarted;
+    }
+
+    public static void UnregisterEvents()
+    {
+        ServerEvents.RoundStarted -= OnRoundStarted;
+    }
+
+    private static void OnRoundStarted()
+    {
+        if (Main.Instance.Config.StartAnnoucment != true) return;
+        FlickerAllLights();
+    }
+    
+    private static void FlickerAllLights()
+    {
+        try
         {
-            try
+            Map.TurnOffLights(10f);
+            foreach (var door in Door.List)
             {
-                Map.TurnOffAllLights(10f);
-                Door.LockAll(20, DoorLockType.Lockdown079);
-                Cassie.Message("<i><b><align=center> bell_start pitch_0.4 .G4 .G4 .G5 pitch_0.9 .G4 <color=blue> Attention .G3 Attention .G4 <color=red> SCP ? ? ? <color=white> has not escaped out of the <color=red> containment  <color=white> pitch_0.4 .G4 pitch_0.9 repeat .G4 <color=red> SCP ? ? ? <color=white> has not <color=red> breached <color=white> the <color=red> containment bell_end", isNoisy: false, isSubtitles: true);
+                door.Lock(DoorLockReason.Lockdown079, true);
             }
-            catch (Exception ex)
+
+            Timing.CallDelayed(10, () =>
             {
-                Log.Error($"[FlickerLights] Error: {ex}");
-            }
+                foreach (var door in Door.List)
+                {
+                    door.Lock(DoorLockReason.Lockdown079, false);
+                }
+            });
+            
+            Cassie.Message("bell_start pitch_0.4 .G4 .G4 .G5 pitch_0.9 .G4 Attention .G3 Attention .G4 SCP ? ? ? has not escaped out of the containment pitch_0.4 .G4 pitch_0.9 repeat .G4 SCP ? ? ? has not breached the containment bell_end",
+                isNoisy: false,
+                customSubtitles: "<color=blue>Attention Attention</color> <color=red>SCP-???</color> has not escaped out of the <color=red>containment</color> repeat <color=red>SCP-???</color> has not <color=red>breached</color> the <color=red>containment</color>");
         }
-
-        public void OnRoundStarted()
+        catch (Exception ex)
         {
-            if (Main.Instance.Config.Start_Annoucment != true) return;
-            FlickerAllLights();
-        }
-
-        public void Register()
-        {
-            Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
-        }
-
-        public void Unregister()
-        {
-            Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
+            Logger.Error($"[FlickerLights] Error: {ex}");
         }
     }
 }

@@ -1,85 +1,81 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using CommandSystem;
+using LabApi.Features.Wrappers;
 using PlayerRoles;
-using PluginAPI.Core;
 using UnityEngine;
-using Log = PluginAPI.Core.Log;
-using Map = PluginAPI.Core.Map;
+using Logger = LabApi.Features.Console.Logger;
 
-namespace RPF.Commands.Client
+namespace RPF.Commands.Client;
+
+[CommandHandler(typeof(ClientCommandHandler))]
+public class Overload : ICommand
 {
-    [CommandHandler(typeof(ClientCommandHandler))]
-    public class Overload : ICommand
+    public string Command => Main.Instance.Config.OverloadCommand;
+    public string[] Aliases => new[] { "Overload" };
+    public string Description => "Command for 079";
+    
+    private static bool _usedThisRound;
+        
+    public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        public bool Execute(ArraySegment<string> arguments, ICommandSender sender, [UnscopedRef] out string response)
-        {
-            var player = Exiled.API.Features.Player.Get(sender);
-            
-            if (player.Role.Type != RoleTypeId.Scp079)
-            {
-                response = "You must be Scp 079";
-                return false;
-            }
+        var player = Player.Get(sender);
 
-            if (_usedThisRound)
-            {
-                response = "You cannot do this command anymore you had alredy done it!";
-                return false;
-            }
-            
-            _usedThisRound = true;
-            
-            response = "Overload in progress...";
-            Task.Run(async () =>
-                {
-                    await FlickerLights();
-                    await LightsColor();
-                });
-            
-            return true;
-            
+        if (player.Role != RoleTypeId.Scp079)
+        {
+            response = "You must be Scp 079";
+            return false;
         }
 
-        private static async Task FlickerLights()
+        if (_usedThisRound)
         {
-            if (Main.Instance.Config.EnableOverloadCommand != true) return;
-                try
-                {
-                    Map.FlickerAllLights(5f);
-                    await Task.Delay(500);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"[FlickerLights] error in executing command: {ex}");
-                }
+            response = "You cannot do this command anymore you have already done it!";
+            return false;
         }
 
-        private static async Task LightsColor()
+        _usedThisRound = true;
+
+        response = "Overload in progress...";
+        Task.Run(async () =>
         {
-            if (Main.Instance.Config.EnableOverloadCommand != true) return;
-                try
-                {
-                    Map.ChangeColorOfAllLights(Color.red);
-                    await Task.Delay(500);
-                    Cassie.Message(
-                        Main.Instance.Config.Overload079Cassie,
-                        isNoisy: false,
-                        isSubtitles: true
-                        );
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"[DoorLocksColor] error in executing command: {ex}");
-                }
-            
+            await FlickerLights();
+            await LightsColor();
+        });
+
+        return true;
+    }
+
+    private static async Task FlickerLights()
+    {
+        if (Main.Instance.Config.EnableOverloadCommand != true) return;
+        try
+        {
+            Map.TurnOffLights(5f);
+            await Task.Delay(500);
         }
-        
-        private static bool _usedThisRound = false;
-        
-        public string Command => Main.Instance.Config.OverloadCommand;
-        public string[] Aliases => ["Overload"];
-        public string Description => "Command for 079";
+        catch (Exception ex)
+        {
+            Logger.Error($"[FlickerLights] error in executing command: {ex}");
+        }
+    }
+
+    private static async Task LightsColor()
+    {
+        if (Main.Instance.Config.EnableOverloadCommand != true) return;
+            
+        try
+        {
+            Map.SetColorOfLights(Color.red);
+            await Task.Delay(500);
+            Cassie.Message(
+                Main.Instance.Config.Overload079Cassie,
+                isNoisy: false,
+                isSubtitles: true
+            );
+        }
+        catch (Exception ex)
+        {
+            Logger.Error($"[DoorLocksColor] error in executing command: {ex}");
+        }
     }
 }

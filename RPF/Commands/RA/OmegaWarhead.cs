@@ -1,62 +1,58 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Threading.Tasks;
+using System.Linq;
 using CommandSystem;
-using Exiled.API.Enums;
-using Exiled.API.Features;
+using LabApi.Features.Wrappers;
 using MEC;
 using UnityEngine;
-using Cassie = LabApi.Features.Wrappers.Cassie;
+using Logger = LabApi.Features.Console.Logger;
 
-namespace RPF.Commands.RA
+namespace RPF.Commands.RA;
+
+[CommandHandler(typeof(RemoteAdminCommandHandler))]
+public class OmegaWarhead : ICommand
 {
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    public class OmegaWarhead : ICommand
+    public string Command { get; } = "OmegaWarhead";
+    public string[] Aliases => new[] { "OmegaWarhead" };
+    public string Description { get; } = "Starts the legendary Omega Warhead";
+
+    public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        private void Part()
-        {
-            foreach (Player ply in Player.List)
-            {
-                if (ply == null) continue;
-                ply.Kill("Vaporized by Omega Warhead.");
-                ply.ExplodeEffect(ProjectileType.FragGrenade);
-            }
-            
-            Log.Info("Omega Warhead has been detonated.");
-        }
-        
-        private static Task Extetic()
-        {
-            try
-            {
-                Warhead.Start();
-                Map.ChangeLightsColor(Color.blue);
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Omega Warhead exeption occurd: {ex}");
-            }
+        response = "Omega Warhead is running...";
+        Extetic();
+        Timing.CallDelayed(Warhead.DetonationTime, Part);
+        return true;
+    }
 
-            return Task.CompletedTask;
-        }
-        
-        
-        public bool Execute(ArraySegment<string> arguments, ICommandSender sender, [UnscopedRef] out string response)
+    private static void Extetic()
+    {
+        try
         {
-            response = "Omega Warhead is running...";
-            Extetic();
-            Timing.CallDelayed(100f, () =>
-            {
-                Part();
-                Cassie.Clear();
-            });
-            return true;
-            
+            Warhead.Start();
+            Warhead.IsLocked = true;
+            Map.SetColorOfLights(Color.blue);
+        }
+        catch (Exception ex)
+        {
+            Logger.Error($"Omega Warhead exception occured: {ex}");
+        }
+    }
+
+    private void Part()
+    {
+        if (Warhead.IsDetonated)
+        {
+            Warhead.Shake();
+        }
+        else
+        {
+            Warhead.Detonate();
         }
 
-        public string Command { get; } = "OmegaWarhead";
-        public string[] Aliases { get; } = [ "OmegaWarhead" ];
-        public string Description { get; } = "Starts the legendary Omega Warhead";
-    } 
+        foreach (var ply in Player.List.Where(x => x.IsAlive))
+        {
+            ply.Kill("Vaporized by Omega Warhead.");
+        }
+
+        Logger.Info("Omega Warhead has been detonated.");
+    }
 }

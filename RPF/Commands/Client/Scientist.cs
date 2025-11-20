@@ -1,46 +1,40 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using CommandSystem;
-using Exiled.API.Features;
+using LabApi.Features.Wrappers;
 using PlayerRoles;
 
-namespace RPF.Commands.Client
+namespace RPF.Commands.Client;
+
+[CommandHandler(typeof(ClientCommandHandler))]
+public class Scientist : ICommand
 {
-    [CommandHandler(typeof(ClientCommandHandler))]
-    public class Scientist : ICommand
+    public string Command => "escapeTool";
+    public string[] Aliases => new[] { "escape" };
+    public string Description => "A Scientist can escape the facility";
+        
+    public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        
-        public bool Execute(ArraySegment<string> arguments, ICommandSender sender, [UnscopedRef] out string response)
+        var player = Player.Get(sender);
+
+        if (player.Role != RoleTypeId.Scientist)
         {
-            var player = Player.Get(sender);
-
-            if (_usedThisRound)
-            {
-                response = "You cant't do the command anymore. Please try again. Or another Scientist Alredy executed it!";
-                return false;
-            }
-
-            if (player.Role.Type != RoleTypeId.Scientist)
-            {
-                response = "You MUST be a Scientist to run this command!";
-                return false;
-            }
-            
-            _usedThisRound = true;
-            
-            response = "Command received.";
-            player.Broadcast(10,
-                Main.Instance.Config.ScientistInstructions,
-                Broadcast.BroadcastFlags.Normal,
-                false);
-            player.AddItem(ItemType.KeycardFacilityManager);
-            return true;
+            response = "You MUST be a Scientist to run this command!";
+            return false;
         }
-        
-        private static bool _usedThisRound = false;
+            
+        if (_usedThisRound)
+        {
+            response = "You can't do the command anymore, another Scientist Already executed it!";
+            return false;
+        }
+            
+        _usedThisRound = true;
 
-        public string Command => "excapeTool";
-        public string[] Aliases => ["excapeTool"];
-        public string Description => "A Scientist Can Excape the facility";
+        response = "Command received.";
+        player.SendHint(Main.Instance.Config.ScientistInstructions, 10);
+        player.AddItem(ItemType.KeycardFacilityManager);
+        return true;
     }
+
+    private static bool _usedThisRound = false;
 }

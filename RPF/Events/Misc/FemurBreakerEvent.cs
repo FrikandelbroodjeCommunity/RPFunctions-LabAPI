@@ -9,6 +9,7 @@ using LabApi.Features.Wrappers;
 using MapGeneration;
 using MEC;
 using PlayerRoles;
+using PlayerStatsSystem;
 using ProjectMER.Features.Extensions;
 using UnityEngine;
 using Logger = LabApi.Features.Console.Logger;
@@ -130,7 +131,7 @@ public static class FemurBreakerEvent
         var scp106 = Player.List.FirstOrDefault(p => p.IsAlive && p.Role == RoleTypeId.Scp106);
         if (scp106 != null)
         {
-            scp106.Kill("Killed by FemurBreaker");
+            scp106.Damage(new UniversalDamageHandler(scp106.Health * 2, DeathTranslations.Recontained));
             Logger.Info("[FemurBreaker] SCP-106 neutralized.");
         }
 

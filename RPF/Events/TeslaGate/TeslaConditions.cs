@@ -21,7 +21,6 @@ public class TeslaConditions
         if (ev.Player.Team == Team.FoundationForces)
         {
             ev.IsAllowed = false;
-            ev.Player.SendHint("Tesla disabled for member of the foundation.", 10);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using FrikanUtils.ProjectMer;
 using LabApi.Features.Wrappers;
+using PlayerStatsSystem;
 using UnityEngine;
 
 namespace RPF.Events.Misc;
@@ -18,7 +19,7 @@ public class FemurBreakerKillTrigger : TriggerPrimitive
         var player = Player.Get(other.gameObject);
         if (player == null) return;
 
-        player.Kill("You were sacrificed for the recontainment of SCP-106");
+        player.Damage(new UniversalDamageHandler(player.Health * 2, DeathTranslations.UsedAs106Bait));
         HasSacrifice = true;
         Door.position = OriginalPos;
     }

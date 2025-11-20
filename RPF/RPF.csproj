@@ -35,7 +35,6 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Assets.cs" />
-        <Compile Include="Commands\Client\FemurActivator.cs" />
         <Compile Include="Commands\Client\Hack.cs" />
         <Compile Include="Commands\Client\Overload.cs" />
         <Compile Include="Commands\Client\Scientist.cs" />

@@ -35,7 +35,6 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Assets.cs" />
-        <Compile Include="Commands\Client\Hack.cs" />
         <Compile Include="Commands\Client\Overload.cs" />
         <Compile Include="Commands\Client\Scientist.cs" />
         <Compile Include="Commands\RA\OmegaWarhead.cs" />
@@ -55,6 +54,7 @@
         <Compile Include="Events\CustomWeapon\WeaponHandler.cs" />
         <Compile Include="Events\CustomWeapon\weapons\AimBotGun.cs" />
         <Compile Include="Events\CustomWeapon\weapons\MediGun.cs" />
+        <Compile Include="Events\Hack\HackEvent.cs" />
         <Compile Include="Events\Misc\FemurBreakerEvent.cs" />
         <Compile Include="Events\Misc\FemurBreakerKillTrigger.cs" />
         <Compile Include="Events\RPSCP\Scp096ElevatorRestriction.cs" />
@@ -113,10 +113,10 @@
         <Reference Include="ProjectMER">
             <HintPath>$(SL_DEPENDENCIES)\ProjectMER-publicized.dll</HintPath>
         </Reference>
-      <Reference Include="System"/>
-      <Reference Include="System.Core"/>
-      <Reference Include="System.Data"/>
-      <Reference Include="System.Xml"/>
+      <Reference Include="System" />
+      <Reference Include="System.Core" />
+      <Reference Include="System.Data" />
+      <Reference Include="System.Xml" />
       <Reference Include="UnityEngine">
         <HintPath>$(UNITY_REFERENCES)\UnityEngine.dll</HintPath>
       </Reference>

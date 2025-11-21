@@ -22,7 +22,6 @@ namespace RPF
         public int FemurBreakerDelaySeconds { get; set; } = 8;
         
         [Description("------------------------ Overload Command ---------------------")]
-        public string OverloadCommand { get; set; } = "Overload";
         public bool EnableOverloadCommand { get; set; } = true;
         public string Overload079Cassie { get; set; } = "Overload... Completed...";
         
@@ -37,6 +36,9 @@ namespace RPF
         
         [Description("------------------------- SCP 914 kills -------------------------")]
         public bool Scp914Kill { get; set; } = true;
+
+        [Description("------------------------- Hack -------------------------")]
+        public bool UseHack { get; set; } = true;
         
         [Description("------------------------- Custom Roles & Items ----------------------")]
         public bool CustomRoles { get; set; } = true;

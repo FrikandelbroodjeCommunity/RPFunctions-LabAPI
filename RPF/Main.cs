@@ -4,6 +4,7 @@ using LabApi.Features.Console;
 using LabApi.Loader.Features.Plugins;
 using RPF.Events._914Event;
 using RPF.Events.BroadCast;
+using RPF.Events.Hack;
 using RPF.Events.Misc;
 using RPF.Events.RPSCP;
 using RPF.Events.TeslaGate;
@@ -19,11 +20,11 @@ public class Main : Plugin<Config>
     public override Version RequiredApiVersion => new(LabApiProperties.CompiledVersion);
 
     public static Main Instance { get; private set; }
-    
+
     public override void Enable()
     {
         Instance = this;
-        
+
         if (Config.Enable106Functions) Scp106DoorRestriction.RegisterEvents();
         if (Config.Enable096Functions) Scp096ElevatorRestriction.RegisterEvents();
         if (Config.Enable939Functions) Scp939DoorRestriction.RegisterEvents();
@@ -31,9 +32,10 @@ public class Main : Plugin<Config>
         if (Config.StartAnnoucment) BroadCastBreach.RegisterEvents();
         if (Config.TeslaConditions) TeslaConditions.RegisterEvents();
         if (Config.Scp914Kill) Kill914.RegisterEvents();
-        
+        if (Config.UseHack) HackEvent.RegisterEvents();
+
         Assets.Load();
-        
+
         Logger.Info("RPF enabled");
     }
 
@@ -47,7 +49,8 @@ public class Main : Plugin<Config>
         BroadCastBreach.UnregisterEvents();
         TeslaConditions.UnregisterEvents();
         Kill914.UnregisterEvents();
-        
+        HackEvent.UnregisterEvents();
+
         Logger.Info("RPF disabled");
     }
 }

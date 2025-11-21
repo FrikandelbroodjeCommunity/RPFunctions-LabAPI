@@ -1,4 +1,5 @@
-﻿using LabApi.Events.Arguments.PlayerEvents;
+﻿using System.Linq;
+using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Handlers;
 using LabApi.Features.Wrappers;
 using PlayerRoles;
@@ -19,6 +20,11 @@ public static class Scp106DoorRestriction
 
     private static void OnInteractingDoor(PlayerInteractingDoorEventArgs ev)
     {
+        if (Player.List.Count(x => x.Team == Team.SCPs) < 2)
+        {
+            return;
+        }
+        
         if (ev.Player.Role != RoleTypeId.Scp106 || ev.Door is ElevatorDoor)
         {
             return;

@@ -17,7 +17,7 @@ namespace RPF
         
         [Description("----------------------- FemurBreaker -----------------------")]
         public bool EnableFemurBreaker { get; set; } = true;
-        public int GeneratorsRequired { get; set; } = 3;
+        public int GeneratorsRequired { get; set; } = 2;
         public bool OnlyHumansCanTrigger { get; set; } = true;
         public int FemurBreakerDelaySeconds { get; set; } = 8;
         

@@ -57,6 +57,7 @@
         <Compile Include="Events\Hack\HackEvent.cs" />
         <Compile Include="Events\Misc\FemurBreakerEvent.cs" />
         <Compile Include="Events\Misc\FemurBreakerKillTrigger.cs" />
+        <Compile Include="Events\Misc\FemurBreakerPatch.cs" />
         <Compile Include="Events\RPSCP\Scp096ElevatorRestriction.cs" />
         <Compile Include="Events\RPSCP\Scp106DoorRestriction.cs" />
         <Compile Include="Events\RPSCP\Scp939DoorRestriction.cs" />

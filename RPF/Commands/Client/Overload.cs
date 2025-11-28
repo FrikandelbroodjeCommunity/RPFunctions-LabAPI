@@ -15,7 +15,7 @@ public class Overload : ICommand
     public string[] Aliases => Array.Empty<string>();
     public string Description => "Command for 079";
     
-    private static bool _usedThisRound;
+    public static bool UsedThisRound;
         
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
@@ -27,13 +27,13 @@ public class Overload : ICommand
             return false;
         }
 
-        if (_usedThisRound)
+        if (UsedThisRound)
         {
             response = "You cannot do this command anymore you have already done it!";
             return false;
         }
 
-        _usedThisRound = true;
+        UsedThisRound = true;
 
         response = "Overload in progress...";
         Task.Run(async () =>

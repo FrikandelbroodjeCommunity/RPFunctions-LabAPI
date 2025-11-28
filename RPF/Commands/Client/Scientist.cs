@@ -12,6 +12,8 @@ public class Scientist : ICommand
     public string[] Aliases => new[] { "escape" };
     public string Description => "A Scientist can escape the facility";
         
+    public static bool UsedThisRound;
+    
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
         var player = Player.Get(sender);
@@ -22,13 +24,13 @@ public class Scientist : ICommand
             return false;
         }
             
-        if (_usedThisRound)
+        if (UsedThisRound)
         {
             response = "You can't do the command anymore, another Scientist Already executed it!";
             return false;
         }
             
-        _usedThisRound = true;
+        UsedThisRound = true;
 
         response = "Command received.";
         player.SendHint(Main.Instance.Config.ScientistInstructions, 10);
@@ -36,5 +38,4 @@ public class Scientist : ICommand
         return true;
     }
 
-    private static bool _usedThisRound = false;
 }

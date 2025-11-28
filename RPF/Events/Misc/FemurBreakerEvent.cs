@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using FrikanUtils.ProjectMer;
 using Interactables.Interobjects.DoorUtils;
+using LabApi.Events.Arguments.PlayerEvents;
+using LabApi.Events.Arguments.WarheadEvents;
 using LabApi.Events.Handlers;
 using LabApi.Features.Enums;
 using LabApi.Features.Wrappers;
@@ -20,8 +21,9 @@ public static class FemurBreakerEvent
 {
     private static Config Config => Main.Instance.Config;
 
+    public static bool DoorUnlockedByGenerators;
+    
     private static bool _isRunning;
-    private static bool _doorUnlockedByGenerators;
     private static Door _entranceDoor;
     private static Door _chamberDoor;
     private static CoroutineHandle _handle;
@@ -36,7 +38,7 @@ public static class FemurBreakerEvent
     public static void UnregisterEvents()
     {
         ServerEvents.RoundStarted -= OnRoundStarted;
-
+        
         if (_handle.IsRunning)
         {
             Timing.KillCoroutines(_handle);
@@ -65,7 +67,7 @@ public static class FemurBreakerEvent
         }, "FemurBreaker", 10);
 
         _isRunning = false;
-        _doorUnlockedByGenerators = false;
+        DoorUnlockedByGenerators = false;
 
         _entranceDoor = Door.List.FirstOrDefault(d => d.DoorName == DoorName.Hcz106Primiary);
         _chamberDoor = Door.List.FirstOrDefault(d => d.DoorName == DoorName.Hcz106Secondary);
@@ -89,16 +91,16 @@ public static class FemurBreakerEvent
 
         _handle = Timing.RunCoroutine(MonitorGeneratorsAsync());
     }
-
+    
     private static IEnumerator<float> MonitorGeneratorsAsync()
     {
         yield return Timing.WaitForSeconds(60);
         while (Round.IsRoundStarted)
         {
             var active = CountActiveGenerators();
-            if (!_doorUnlockedByGenerators && active >= Config.GeneratorsRequired)
+            if (!DoorUnlockedByGenerators && active >= Config.GeneratorsRequired)
             {
-                _doorUnlockedByGenerators = true;
+                DoorUnlockedByGenerators = true;
 
                 _entranceDoor?.Lock(DoorLockReason.AdminCommand, false);
                 _chamberDoor?.Lock(DoorLockReason.AdminCommand, false);
@@ -116,7 +118,7 @@ public static class FemurBreakerEvent
         return Generator.List.Count(g => g.Engaged);
     }
 
-    public static IEnumerator<float> RunFemurBreaker()
+    private static IEnumerator<float> RunFemurBreaker()
     {
         _isRunning = true;
 
@@ -135,10 +137,6 @@ public static class FemurBreakerEvent
             Logger.Info("[FemurBreaker] SCP-106 neutralized.");
         }
 
-        Cassie.Message(
-            "SCP 1 0 6 SUCCESSFULLY TERMINATED",
-            isNoisy: false,
-            customSubtitles: "SCP-106 successfully terminated");
         Map.SetColorOfLights(Color.green);
         yield return Timing.WaitForSeconds(1);
         Map.ResetColorOfLights();

@@ -1,7 +1,10 @@
 ﻿using System;
+using HarmonyLib;
+using LabApi.Events.Handlers;
 using LabApi.Features;
 using LabApi.Features.Console;
 using LabApi.Loader.Features.Plugins;
+using RPF.Commands.Client;
 using RPF.Events._914Event;
 using RPF.Events.BroadCast;
 using RPF.Events.Hack;
@@ -21,6 +24,8 @@ public class Main : Plugin<Config>
 
     public static Main Instance { get; private set; }
 
+    private readonly Harmony _harmony = new Harmony("com.gamendegamer.rpf");
+
     public override void Enable()
     {
         Instance = this;
@@ -33,12 +38,14 @@ public class Main : Plugin<Config>
         if (Config.TeslaConditions) TeslaConditions.RegisterEvents();
         if (Config.Scp914Kill) Kill914.RegisterEvents();
         if (Config.UseHack) HackEvent.RegisterEvents();
+        ServerEvents.WaitingForPlayers += OnWaitingForPlayers;
 
+        _harmony.PatchAll();
+        
         Assets.Load();
 
         Logger.Info("RPF enabled");
     }
-
 
     public override void Disable()
     {
@@ -50,7 +57,16 @@ public class Main : Plugin<Config>
         TeslaConditions.UnregisterEvents();
         Kill914.UnregisterEvents();
         HackEvent.UnregisterEvents();
+        ServerEvents.WaitingForPlayers -= OnWaitingForPlayers;
+        
+        _harmony.UnpatchAll();
 
         Logger.Info("RPF disabled");
+    }
+
+    private static void OnWaitingForPlayers()
+    {
+        Scientist.UsedThisRound = false;
+        Overload.UsedThisRound = false;
     }
 }

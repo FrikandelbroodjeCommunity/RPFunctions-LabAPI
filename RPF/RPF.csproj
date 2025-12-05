@@ -70,16 +70,6 @@
       <None Include="packages.config" />
     </ItemGroup>
     <ItemGroup>
-      <Content Include="Images\Overload.png" />
-      <Content Include="Images\ExcapeTool.png" />
-      <Content Include="Images\OmegaWarhead.png" />
-      <Content Include="Images\CIClass-D.png" />
-      <Content Include="Images\RPFBanner.jpg" />
-      <Content Include="Images\SiteManager.png" />
-      <Content Include="Images\SuperAdrenaline.png" />
-      <Content Include="Images\Emp_Device.png" />
-    </ItemGroup>
-    <ItemGroup>
       <Reference Include="0Harmony">
         <HintPath>$(SL_DEPENDENCIES)\0Harmony.dll</HintPath>
       </Reference>

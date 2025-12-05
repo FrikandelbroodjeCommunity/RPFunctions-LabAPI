@@ -78,7 +78,6 @@
       <Content Include="Images\SiteManager.png" />
       <Content Include="Images\SuperAdrenaline.png" />
       <Content Include="Images\Emp_Device.png" />
-      <Content Include="README.md" />
     </ItemGroup>
     <ItemGroup>
       <Reference Include="0Harmony">

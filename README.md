@@ -1,62 +1,74 @@
-# RPFunctions Plugin.
-![RPFBanner.jpg](./RPF/Images/RPFBanner.jpg)
-An new Exiled Plugin By Mr.Cat😉
+[![GitHub release](https://flat.badgen.net/github/release/FrikandelbroodjeCommunity/RPFunctions-LabAPI/)](https://github.com/FrikandelbroodjeCommunity/RPFunctions-LabAPI/releases/latest)
+[![LabAPI Version](https://flat.badgen.net/static/LabAPI%20Version/v1.1.4)](https://github.com/northwood-studios/LabAPI)
+[![Original](https://flat.badgen.net/static/Original/MRCAT9898?icon=github)](https://github.com/MRCAT9898/RPFunctions)
+[![License](https://flat.badgen.net/static/license/MIT)](#about-the-license)
 
+# About RPFunctions
 
-## What this Plugin do?
+![RPFBanner.jpg](./Images/RPFBanner.jpg)
 
-**This Plugin Add RP Event to make sure that the server
-is 100% RolePlay! The Config very argumented for your
-customification!**
+This plugin adds RP events to the server. Configurable to your liking.
 
-This Plugin Specifically add these things to your Server:
+- Custom breach announcement when the round starts.
+- Brings the femur breaker back.
+- Roleplay commands for players and moderators.
+- Omega warhead added to the Game. (requires RA access)
+- Adds custom roles and items to the game.
+- SCPs now have more realistic restrictions. (e.g. SCP-106 can't open doors)
+- MTF & guards no longer have to worry about tesla gates.
+- Players get upgraded in SCP-914, always resulting in death.
 
-- Custom Breach On round started
-- Custom Events for Better Content
-- Femur Breaker
-- Commands for Client and RA for RolePlay
-- Omega Warhead in Game! (RA command to start)
-- For Better RP we are introducing CustomRoles & CustomItems!
-- SCP now are RP! (Like 106 can't open doors.)
-- Premium Version for access other Content!
-- Custom Weapons!
-- Tesla Gate Conditions!
-- 914 Event (Kill when player enter in 914 and when it activated The player get killed.)
-- SSS for max costumation.
+# Installation
 
-## Screenshots:
-### Omega Warhead:
-![App Screenshot](./RPF/Images/OmegaWarhead.png)
+> [!IMPORTANT]
+> **Required dependencies:**
+> - [FrikanUtils](https://github.com/FrikandelbroodjeCommunity/FrikanUtils/blob/master/FrikanUtils/README.md)
+> - [FrikanUtils-ProjectMer](https://github.com/FrikandelbroodjeCommunity/FrikanUtils/blob/master/FrikanUtils-ProjectMer/README.md)
+> - [ProjectMER](https://github.com/Michal78900/ProjectMER/releases/latest)
 
-### Custom Roles:
-![App Screenshot](./RPF/Images/SiteManager.png)
-![App Screenshot](./RPF/Images/CIClass-D.png)
+Install the dependencies listed above, and place
+the [latest release](https://github.com/FrikandelbroodjeCommunity/RPFunctions-LabAPI/releases/latest) in the LabAPI
+plugin folder.
 
-### Custom Items:
-![App Screenshot](./RPF/Images/Emp_Device.png)
-![App Screenshot](./RPF/Images/SuperAdrenaline.png)
+The plugin requires the femur breaker & "hack device" to be provided as a schematic, download it from
+the [releases page](https://github.com/FrikandelbroodjeCommunity/RPFunctions-LabAPI/releases/latest) and place it in the
+correct folder. By default, this will be <code>LabAPI/configs/{port/global}/FrikanUtils/Maps/FemurBreaker.json</code>
+and <code>LabAPI/configs/{port/global}/FrikanUtils/Maps/HackDevice.json</code>.
 
-### Custom Commands:
-![App Screenshot](./RPF/Images/ExcapeTool.png)
-![App Screenshot](./RPF/Images/Overload.png)
+# Commands
 
-## Support
+| command        | Aliases  | Usage          | Command type    | Description                                                                              |
+|----------------|----------|----------------|-----------------|------------------------------------------------------------------------------------------|
+| `overload`     |          | `.overload`    | Console command | Can be used by SCP-079 once every round, will turn the lights of for 5 seconds.          |
+| `escapeTool`   | `escape` | `.escape`      | Console command | Can be used by 1 scientist every round, grants them a facility manager keycard.          |
+| `omegawarhead` |          | `omegawarhead` | RA command      | Can be used by moderators to start the omega warhead. Cannot be disabled after starting. |
 
-For support, email: sigmapurgatorium12@outlook.it or server Exiled.
+# Screenshots
 
+## Omega Warhead
 
-## Authors:
+![App Screenshot](./Images/OmegaWarhead.png)
 
-- [@MRCAT9898](https://www.github.com/MRCAT9898)
+## Custom Roles
 
-## License
+![App Screenshot](./Images/SiteManager.png)
+![App Screenshot](./Images/CIClass-D.png)
 
-[MIT](https://choosealicense.com/licenses/mit/)
+## Custom Items
 
-## Badges
+![App Screenshot](./Images/Emp_Device.png)
+![App Screenshot](./Images/SuperAdrenaline.png)
 
-Badges: [shields.io](https://shields.io/)
+## Custom Commands
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
-[![AGPL License](https://img.shields.io/badge/license-AGPL-blue.svg)](http://www.gnu.org/licenses/agpl-3.0)
+![App Screenshot](./Images/ExcapeTool.png)
+![App Screenshot](./Images/Overload.png)
+
+# Config
+
+TODO: add the table...
+
+# About the license
+
+The original repository did not include a license file, thus this one does not include one either.
+However, it did provide a link to the [MIT license](https://choosealicense.com/licenses/mit/).
